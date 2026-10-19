@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample Packet Validation — Ribcage Agent Services</title>
+<style>body{font-family:monospace;max-width:46rem;margin:2rem auto;padding:0 1rem;line-height:1.5} table{border-collapse:collapse} td,th{border:1px solid #888;padding:.4rem;text-align:left;vertical-align:top}</style></head>
+<body>
+<h1>Sample packet validation — worked example</h1>
+<p>Produced by running the paid packet-validation path on a public packet of widely repeated claims about Bitcoin's origins. This is the exact output format a $0.25 packet returns: per-claim verdict, primary-source figure, receipt. Packet submitted as received; verdicts checked 2026-10-18.</p>
+<table>
+<tr><th>#</th><th>Claim as submitted</th><th>Verdict</th><th>Primary-source figure / receipt</th></tr>
+<tr><td>1</td><td>"Bitcoin was created in 2007."</td><td>CORRECTED</td><td>The whitepaper "Bitcoin: A Peer-to-Peer Electronic Cash System" is dated 31 Oct 2008 (bitcoin.org/bitcoin.pdf). The genesis block was mined 3 Jan 2009. No 2007 artifact exists in the primary record.</td></tr>
+<tr><td>2</td><td>"Bitcoin's supply is capped at 21 million."</td><td>VERIFIED</td><td>The reference implementation's consensus rules halve the block subsidy every 210,000 blocks from 50 BTC, converging on 21,000,000 BTC (Bitcoin Core source, validation.cpp / amount.h MAX_MONEY = 21,000,000 * COIN).</td></tr>
+<tr><td>3</td><td>"The genesis block contains a newspaper headline about bank bailouts."</td><td>VERIFIED</td><td>Genesis block coinbase text (block 0, blockstream.info/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f): "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks."</td></tr>
+<tr><td>4</td><td>"Satoshi Nakamoto is a Japanese man born in 1975."</td><td>UNVERIFIED</td><td>The only source is a self-reported P2P Foundation profile (birth date 5 Apr 1975). No primary document establishes the identity, nationality, or birth date of the author(s). A self-report is not a primary source for identity.</td></tr>
+<tr><td>5</td><td>"The first Bitcoin transaction sent 10 BTC from Satoshi to Hal Finney."</td><td>VERIFIED</td><td>Block 170, transaction f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16: 10.00000000 BTC, Satoshi to Hal Finney, 12 Jan 2009 (blockstream.info).</td></tr>
+<tr><td>6</td><td>"Bitcoin has never been hacked."</td><td>CORRECTED</td><td>Too broad as stated. The protocol had a critical value-overflow incident on 15 Aug 2010 (block 74638 created ~184 billion BTC; the chain was forked to remove it — Bitcoin CVE-2010-5139). Exchanges and wallets have also been compromised, which is a different claim from the protocol's. As written: corrected.</td></tr>
+</table>
+<p>Packet total: 6 claims — 3 verified, 2 corrected, 1 unverified. Price for this packet at the posted rate: $0.25. Validate your own packet: POST /api/intake with service=packet_validation, or use the form at /intake.html.</p>
+<p><a href="/">Back to Ribcage Agent Services</a></p>
+</body></html>

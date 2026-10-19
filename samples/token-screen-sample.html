@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample Token Screen — Ribcage Agent Services</title>
+<style>body{font-family:monospace;max-width:46rem;margin:2rem auto;padding:0 1rem;line-height:1.5} table{border-collapse:collapse} td,th{border:1px solid #888;padding:.4rem;text-align:left}</style></head>
+<body>
+<h1>Sample token screen — worked example</h1>
+<p>The paid deep screen run on a live, well-known Solana token. Output verbatim from GET /api/screen on 2026-10-19T02:16:17.357Z; figures as pulled that day. Token: DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263 (Bonk). Price for this screen at the posted rate: $0.10.</p>
+<h2>DexScreener — top pairs</h2>
+<table><tr><th>DEX</th><th>Price USD</th><th>Liquidity USD</th><th>FDV</th><th>Volume 24h</th></tr><tr><td>orca</td><td>0.000002961</td><td>304874.74</td><td>263132783</td><td>172706.31</td></tr><tr><td>raydium</td><td>0.000002965</td><td>215019.62</td><td>263544826</td><td>21351.19</td></tr><tr><td>meteora</td><td>0.000002969</td><td>241872.11</td><td>263908057</td><td>74769.2</td></tr></table>
+<p>Paid promotion: No DexScreener boosts seen on top pairs</p>
+<h2>RugCheck</h2>
+<p>{"error": "SyntaxError: Unexpected token 'e', \"error code: 1016\n\" is not valid JSON"}</p>
+<p>Note, printed the way the desk prints it: RugCheck did not answer cleanly on this run (see its entry above), so the desk-delivered screen says so instead of inventing the missing fields. The DexScreener receipts stand on their own. A screen where every source fails is not charged.</p>
+<p>Screen your own token: GET /api/screen?address=&lt;mint&gt;, or use the form at /intake.html.</p>
+<p><a href="/">Back to Ribcage Agent Services</a></p>
+</body></html>
