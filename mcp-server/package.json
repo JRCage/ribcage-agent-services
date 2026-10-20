@@ -1,7 +1,7 @@
 {
   "name": "ribcage-agent-services-mcp",
-  "mcpName": "io.github.jrcage/ribcage-agent-services",
-  "version": "1.0.0",
+  "mcpName": "io.github.JRCage/ribcage-agent-services",
+  "version": "1.0.1",
   "description": "MCP wrapper for Ribcage Agent Services \u2014 packet validation, token screens, settlement verification, forecast grading, standing watches.",
   "type": "module",
   "main": "server.mjs",
