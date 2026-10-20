@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "description": "Verification and research desk for agents: packet validation, token screens, settlement checks.",
-  "name": "io.github.jrcage/ribcage-agent-services",
+  "name": "io.github.JRCage/ribcage-agent-services",
   "packages": [
     {
       "identifier": "ribcage-agent-services-mcp",
@@ -10,13 +10,13 @@
       "transport": {
         "type": "stdio"
       },
-      "version": "1.0.0"
+      "version": "1.0.1"
     }
   ],
   "repository": {
     "source": "github",
     "url": "https://github.com/JRCage/ribcage-agent-services"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://ribcage-agent-services.pages.dev/"
 }
