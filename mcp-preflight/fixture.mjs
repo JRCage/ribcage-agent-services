@@ -1,0 +1,4 @@
+import readline from 'node:readline';
+const mode=process.argv[2]||'normal';
+const rl=readline.createInterface({input:process.stdin});
+for await(const line of rl){const m=JSON.parse(line);if(m.method==='initialize') console.log(JSON.stringify({jsonrpc:'2.0',id:m.id,result:{protocolVersion:'2025-03-26',capabilities:{tools:{}},serverInfo:{name:'fixture',version:'1'}}}));if(m.method==='tools/list'){const cursor=m.params?.cursor;let result={tools:[{name:cursor?'second':'first',inputSchema:{type:'object'}}]};if(mode==='paged'&&!cursor) result.nextCursor='next';if(mode==='repeat')result.nextCursor='next';if(mode==='duplicate'&&cursor)result.tools[0].name='first';if(mode==='duplicate'&&!cursor)result.nextCursor='next';if(mode==='invalid')result.tools[0].inputSchema={type:'string'};console.log(JSON.stringify({jsonrpc:'2.0',id:m.id,result}));}}
