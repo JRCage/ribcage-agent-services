@@ -8,6 +8,10 @@ const child = spawn(args[0], args.slice(1), { stdio: ['pipe','pipe','pipe'], she
 let buffer = '', seq = 0, done = false;
 const failures = [];
 const results = [];
+const names = new Set();
+const cursors = new Set();
+let pages = 0;
+let toolCount = 0;
 const deadline = setTimeout(() => finish('timeout'), 8000);
 child.on('error', e => finish('spawn: ' + e.message));
 child.on('exit', (code) => { if (!done) finish('server exited: ' + code); });
@@ -39,14 +43,23 @@ child.stdout.on('data', chunk => {
       send('tools/list',{},++seq);
     } else if (msg.id===2) {
       if (msg.error || !Array.isArray(msg.result?.tools)) return finish('tools/list failed');
-      const names=new Set();
+      pages++;
+      if (pages > 100) return finish('too many tool pages');
       for (const t of msg.result.tools) {
         if (typeof t.name!=='string' || !t.name || !t.inputSchema || t.inputSchema.type!=='object') failures.push('invalid tool descriptor');
         if (names.has(t.name)) failures.push('duplicate tool: '+t.name);
         names.add(t.name);
+        toolCount++;
       }
-      results.push('tools/list: '+msg.result.tools.length+' tools');
-      finish();
+      const cursor=msg.result.nextCursor;
+      if (cursor !== undefined && cursor !== null && cursor !== '') {
+        if (typeof cursor !== 'string' || cursors.has(cursor)) return finish('invalid or repeated pagination cursor');
+        cursors.add(cursor);
+        send('tools/list',{cursor},2);
+      } else {
+        results.push('tools/list: '+toolCount+' tools across '+pages+' pages');
+        finish();
+      }
     }
   }
 });
