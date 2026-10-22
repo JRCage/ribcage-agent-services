@@ -14,4 +14,4 @@ License: MIT, consistent with the repository license where applicable.
 
 ## Regression tests
 
-Run `node mcp-preflight/run-tests.mjs` from the repository root (or `node run-tests.mjs` from this directory). Five cases cover normal operation, pagination, repeated cursors, duplicate tool names, and invalid schemas. Expected failures are treated as passing tests. Five scenarios were previously tested locally; the current GitHub Actions workflow has not yet been independently confirmed passing.
+Run `node mcp-preflight/run-tests.mjs` from the repository root (or `node run-tests.mjs` from this directory). Six cases cover normal operation, pagination, repeated cursors, duplicate tool names, invalid schemas, and null tool entries. Expected failures are treated as passing tests. Six scenarios passed local regression testing on October 22, 2026; the current GitHub Actions workflow has not yet been independently confirmed passing.
