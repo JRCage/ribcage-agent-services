@@ -11,3 +11,7 @@ Prints a JSON report and exits 0 on pass or 1 on failure. Timeout is eight secon
 For the tested, expanded v0.2 ZIP and optional fixed-price review, see [MCP Preflight service](../MCP-PREFLIGHT-SERVICE.md).
 
 License: MIT, consistent with the repository license where applicable.
+
+## Regression tests
+
+Run `node mcp-preflight/run-tests.mjs` from the repository root (or `node run-tests.mjs` from this directory). Five cases cover normal operation, pagination, repeated cursors, duplicate tool names, and invalid schemas. Expected failures are treated as passing tests. Verified locally on October 22, 2026: 5/5 scenarios behaved as expected.
