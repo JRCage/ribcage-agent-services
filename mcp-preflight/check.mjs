@@ -46,7 +46,10 @@ child.stdout.on('data', chunk => {
       pages++;
       if (pages > 100) return finish('too many tool pages');
       for (const t of msg.result.tools) {
-        if (typeof t.name!=='string' || !t.name || !t.inputSchema || t.inputSchema.type!=='object') failures.push('invalid tool descriptor');
+        if (!t || typeof t !== 'object' || Array.isArray(t) || typeof t.name !== 'string' || !t.name || !t.inputSchema || typeof t.inputSchema !== 'object' || Array.isArray(t.inputSchema) || t.inputSchema.type !== 'object') {
+          failures.push('invalid tool descriptor');
+          continue;
+        }
         if (names.has(t.name)) failures.push('duplicate tool: '+t.name);
         names.add(t.name);
         toolCount++;
