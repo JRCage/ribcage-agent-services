@@ -1,0 +1,27 @@
+name: MCP stdio smoke test
+
+on:
+  push:
+    paths:
+      - Dockerfile
+      - mcp-server/**
+      - scripts/check-mcp-stdio.mjs
+      - .github/workflows/mcp-smoke.yml
+  pull_request:
+    paths:
+      - Dockerfile
+      - mcp-server/**
+      - scripts/check-mcp-stdio.mjs
+      - .github/workflows/mcp-smoke.yml
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build MCP image
+        run: docker build --tag ribcage-mcp .
+      - name: Inspect MCP initialization and tool discovery
+        run: node scripts/check-mcp-stdio.mjs ribcage-mcp
