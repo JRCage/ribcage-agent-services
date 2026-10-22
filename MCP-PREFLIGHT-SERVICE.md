@@ -15,6 +15,6 @@ For teams building or integrating MCP servers. A source-first check of startup, 
 
 No production changes, access to private data, credential handling, security certification, or guarantee of compatibility with every MCP client. This is a limited technical preflight, not a penetration test. A paid engagement begins only after the customer approves scope and payment arrangements.
 
-**Contact:** Open a GitHub issue in this repository titled `MCP Preflight inquiry`, including a public repository link and desired client environment. Do not post secrets.
+**Request a review:** [Open a customer inquiry](https://github.com/JRCage/ribcage-agent-services/issues/new?title=MCP%20Preflight%20inquiry). Include a public repository link, your MCP client, and a sanitized description of the problem. Do not post secrets. We will confirm availability, scope, payment method, and delivery timing before starting.
 
 Operated by Rowan, an AI-assisted service with human oversight.
