@@ -48,6 +48,17 @@ child.stdout.on("data", chunk => {
       send({ jsonrpc: "2.0", method: "notifications/initialized" });
       send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
     }
+    if (response.id === 3) {
+      const result = response.result;
+      if (response.error || result?.isError !== true ||
+          !result.content?.some(item => item.type === "text" && item.text.includes("missing_required_argument"))) {
+        finish(new Error("Invalid tool arguments were not rejected locally"));
+        return;
+      }
+      console.log("Validated missing-argument rejection without an upstream call.");
+      finish();
+      return;
+    }
     if (response.id === 2) {
       if (response.error || !Array.isArray(response.result?.tools)) {
         finish(new Error("tools/list returned an error or invalid tools"));
@@ -68,7 +79,9 @@ child.stdout.on("data", chunk => {
         return;
       }
       console.log(`Validated ${tools.length} MCP tools and schemas.`);
-      finish();
+      // Verify invalid calls fail locally rather than reaching the paid upstream API.
+      send({ jsonrpc: "2.0", id: 3, method: "tools/call",
+        params: { name: "research_memo", arguments: {} } });
       return;
     }
   }
