@@ -49,7 +49,9 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
   }
   for (const [field, value] of Object.entries(a)) {
     const schema = definition.inputSchema.properties[field];
-    if (!schema) continue;
+    if (!schema) {
+      return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "unknown_argument", field }) }] };
+    }
     const validType = schema.type === "array" ? Array.isArray(value) : typeof value === schema.type;
     if (!validType || (schema.enum && !schema.enum.includes(value))) {
       return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "invalid_argument", field }) }] };
