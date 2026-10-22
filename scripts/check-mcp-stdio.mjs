@@ -53,7 +53,21 @@ child.stdout.on("data", chunk => {
         finish(new Error("tools/list returned an error or invalid tools"));
         return;
       }
-      console.log(`Discovered ${response.result.tools.length} tools.`);
+      const tools = response.result.tools;
+      const expected = [
+        "validate_packet", "research_memo", "token_screen", "verify_settlement",
+        "edit_text", "grade_log", "create_watch", "data_catalog",
+      ];
+      const names = tools.map(tool => tool.name);
+      if (new Set(names).size !== names.length || expected.some(name => !names.includes(name))) {
+        finish(new Error(`Unexpected or duplicate MCP tools: ${names.join(", ")}`));
+        return;
+      }
+      if (tools.some(tool => !tool.description || tool.inputSchema?.type !== "object")) {
+        finish(new Error("MCP tool descriptions or input schemas are invalid"));
+        return;
+      }
+      console.log(`Validated ${tools.length} MCP tools and schemas.`);
       finish();
       return;
     }
