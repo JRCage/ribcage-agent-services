@@ -6,12 +6,14 @@ on:
       - Dockerfile
       - mcp-server/**
       - scripts/check-mcp-stdio.mjs
+      - scripts/test-mcp-validation.mjs
       - .github/workflows/mcp-smoke.yml
   pull_request:
     paths:
       - Dockerfile
       - mcp-server/**
       - scripts/check-mcp-stdio.mjs
+      - scripts/test-mcp-validation.mjs
       - .github/workflows/mcp-smoke.yml
   workflow_dispatch:
 
@@ -21,6 +23,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Test MCP argument validation
+        run: node --test scripts/test-mcp-validation.mjs
       - name: Build MCP image
         run: docker build --tag ribcage-mcp .
       - name: Inspect MCP initialization and tool discovery
