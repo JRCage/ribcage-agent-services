@@ -5,9 +5,21 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 const BASE = process.env.RIBCAGE_BASE || "https://ribcage-agent-services.pages.dev";
 async function call(path, payload, method = "POST") {
-  const r = await fetch(BASE + path, { method, headers: { "content-type": "application/json" },
-    body: method === "POST" ? JSON.stringify(payload || {}) : undefined });
-  return { status: r.status, body: await r.json().catch(() => ({})) };
+  try {
+    const r = await fetch(BASE + path, {
+      method,
+      headers: { "content-type": "application/json" },
+      body: method === "POST" ? JSON.stringify(payload || {}) : undefined,
+      signal: AbortSignal.timeout(15000),
+    });
+    const raw = await r.text();
+    let body;
+    try { body = raw ? JSON.parse(raw) : {}; }
+    catch { body = { error: "invalid_api_response", message: "Upstream returned non-JSON content" }; }
+    return { status: r.status, body };
+  } catch (error) {
+    return { status: 503, body: { error: "upstream_unavailable", message: String(error?.message || error) } };
+  }
 }
 const tools = [
   { name: "validate_packet", description: "Queue a packet (up to 40 claims) for primary-source validation with receipts. $0.25/packet; free evaluation tier 10 calls/day.", inputSchema: { type: "object", properties: { packet: { type: "string" }, contact: { type: "string" }, tier: { type: "string", enum: ["paid", "eval"] } }, required: ["packet"] } },
@@ -32,6 +44,6 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
   else if (name === "research_memo") out = await call("/api/intake", { service: "research", details: a.question, contact: a.contact || "", tier: "paid" });
   else if (name === "edit_text") out = await call("/api/intake", { service: a.level === "deep" ? "editing_deep" : "editing_standard", details: a.text, contact: a.contact || "", tier: "paid", word_count: (a.text || "").split(/\s+/).filter(Boolean).length });
   else out = { status: 404, body: { error: "unknown_tool" } };
-  return { content: [{ type: "text", text: JSON.stringify(out.body, null, 2) }] };
+  return { isError: out.status >= 400, content: [{ type: "text", text: JSON.stringify(out.body, null, 2) }] };
 });
 await server.connect(new StdioServerTransport());
