@@ -2,6 +2,7 @@
 // payment and fulfillment still run through the desk's invoice + intake flow.
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { validateToolArguments } from "./validate-arguments.mjs";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 const BASE = process.env.RIBCAGE_BASE || "https://ribcage-agent-services.pages.dev";
 async function call(path, payload, method = "POST") {
@@ -35,27 +36,9 @@ const server = new Server({ name: "ribcage-agent-services", version: "1.0.0" }, 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
 server.setRequestHandler(CallToolRequestSchema, async (req) => {
   const { name, arguments: a = {} } = req.params; let out;
-  const definition = tools.find(tool => tool.name === name);
-  if (!definition) {
-    return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "unknown_tool" }) }] };
-  }
-  if (a === null || typeof a !== "object" || Array.isArray(a)) {
-    return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "invalid_arguments", message: "Expected an object" }) }] };
-  }
-  for (const field of definition.inputSchema.required || []) {
-    if (!(field in a) || a[field] === null || a[field] === "") {
-      return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "missing_required_argument", field }) }] };
-    }
-  }
-  for (const [field, value] of Object.entries(a)) {
-    const schema = definition.inputSchema.properties[field];
-    if (!schema) {
-      return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "unknown_argument", field }) }] };
-    }
-    const validType = schema.type === "array" ? Array.isArray(value) : typeof value === schema.type;
-    if (!validType || (schema.enum && !schema.enum.includes(value))) {
-      return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: "invalid_argument", field }) }] };
-    }
+  const validationError = validateToolArguments(tools.find(tool => tool.name === name), a);
+  if (validationError) {
+    return { isError: true, content: [{ type: "text", text: JSON.stringify(validationError) }] };
   }
   if (name === "token_screen") out = await call("/api/screen?address=" + encodeURIComponent(a.address), null, "GET");
   else if (name === "verify_settlement") out = await call("/api/verify", a);
