@@ -48,6 +48,17 @@ child.stdout.on("data", chunk => {
       send({ jsonrpc: "2.0", method: "notifications/initialized" });
       send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
     }
+    if (response.id === 5) {
+      const result = response.result;
+      if (response.error || result?.isError !== true ||
+          !result.content?.some(item => item.type === "text" && item.text.includes("unknown_argument"))) {
+        finish(new Error("Unexpected tool argument was not rejected locally"));
+        return;
+      }
+      console.log("Validated unknown-argument rejection without an upstream call.");
+      finish();
+      return;
+    }
     if (response.id === 4) {
       const result = response.result;
       if (response.error || result?.isError !== true ||
@@ -56,7 +67,8 @@ child.stdout.on("data", chunk => {
         return;
       }
       console.log("Validated invalid-enum rejection without an upstream call.");
-      finish();
+      send({ jsonrpc: "2.0", id: 5, method: "tools/call",
+        params: { name: "data_catalog", arguments: { unexpected: "value" } } });
       return;
     }
     if (response.id === 3) {
