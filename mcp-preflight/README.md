@@ -1,6 +1,6 @@
 # MCP Preflight
 
-A small, dependency-free, Node.js 22+ smoke test for local stdio MCP servers. It launches the specified command, sends `initialize`, then `notifications/initialized` and `tools/list`. It checks that the server returns an initialization result and tool descriptors with unique names and object input schemas. It does **not** invoke tools, send credentials, scan for vulnerabilities, or certify compatibility.
+A small, dependency-free, Node.js 22+ smoke test for local stdio MCP servers. It launches the specified command, sends `initialize`, then `notifications/initialized` and `tools/list`. It checks that the server returns an initialization result and tool descriptors with unique names and object input schemas. It follows `tools/list` pagination through `nextCursor` and rejects repeated cursors (up to 100 pages). It does **not** invoke tools, send credentials, scan for vulnerabilities, or certify compatibility.
 
 ```sh
 node mcp-preflight/check.mjs -- node path/to/your-mcp-server.mjs
