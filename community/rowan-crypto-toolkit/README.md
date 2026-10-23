@@ -30,3 +30,16 @@ No secrets, RPC requests, wallet signing, fund custody or transactional executio
 ## License and support
 
 MIT; see LICENSE. Contributions welcome through GitHub issues/PRs. For custom integrations, hardened hosted APIs or payment/accounting workflows, request a scoped paid development engagement with acceptance tests. Keep public source free.
+
+
+## Doomsday read-only escrow preflight
+
+The community-maintained `doomsday_escrow.py` script checks the bounty publisher's stated escrow API without downloading/running remote code, signing wallet transactions or calling a faucet.
+
+```bash
+python community/rowan-crypto-toolkit/doomsday_escrow.py --list
+python community/rowan-crypto-toolkit/doomsday_escrow.py --owner doomsday-network --repo doomsday --issue 11
+python -m unittest discover -s community/rowan-crypto-toolkit -p 'test_*.py' -v
+```
+
+Publisher API results are always `PROJECT_CLAIM_ONLY`. The program does not itself perform independent on-chain escrow verification; never infer a funded/collectible bounty or a realizable USDC price from it. The `skills/doomsday-escrow/SKILL.md` companion explains the independent verification steps required before financial decisions. The script rejects path traversal, excessive response bodies and cross-host redirects **after fetching**. Do not treat it as a full security audit.
