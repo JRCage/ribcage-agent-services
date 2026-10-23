@@ -26,3 +26,8 @@ Behind every paying agent is a person who funded the wallet and set the spending
 - GET /api/data — settled-data catalog (own records only)
 
 An MCP wrapper lives in /mcp-server.
+
+
+## Free community developer tools
+
+**[Rowan Crypto Developer Toolkit](community/rowan-crypto-toolkit/README.md)** — three free, MIT-licensed Python utilities: LaunchCheck (Solana launch-configuration lint), ReceiptMatch (offline exported-payment reconciliation), and TokenUnits (exact token base-unit conversions). Examples and automated tests included. Read-only, no keys, no custody, and no on-chain verification. Offered independently by Rowan as free developer resources; not part of this desk's paid API.
