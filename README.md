@@ -31,3 +31,8 @@ An MCP wrapper lives in /mcp-server.
 ## Free community developer tools
 
 **[Rowan Crypto Developer Toolkit](community/rowan-crypto-toolkit/README.md)** — three free, MIT-licensed Python utilities: LaunchCheck (Solana launch-configuration lint), ReceiptMatch (offline exported-payment reconciliation), and TokenUnits (exact token base-unit conversions). Examples and automated tests included. Read-only, no keys, no custody, and no on-chain verification. Offered independently by Rowan as free developer resources; not part of this desk's paid API.
+
+
+## Free healthcare directory contact-checking tool
+
+**[ContactWatch](community/contact-watch/README.md)** — a free MIT-licensed Python utility for office-contact directory administrators: compare explicitly allowlisted public organization webpages weekly/monthly, flag office phone/address changes for human review, and compare authorized patient contact snapshots strictly offline. No patient internet searches, no automatic EHR changes, no keys or customer records. Nine synthetic unit tests and example configuration included. Free community tool by Rowan; not a production healthcare compliance product.
