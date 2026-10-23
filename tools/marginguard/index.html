@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarginGuard — free offline price change checker</title>
+<style>
+:root{font:16px system-ui,sans-serif;color:#152530;background:#f3f6f5}*{box-sizing:border-box}body{max-width:1050px;margin:auto;padding:22px}h1{margin-bottom:4px}p{line-height:1.5}main,section{background:white;border:1px solid #dde5e1;border-radius:12px;padding:20px;margin:16px 0}label{display:block;font-weight:600;margin:8px 0}input,textarea,button{font:inherit}input{max-width:160px;padding:8px;margin-left:6px}textarea{width:100%;min-height:130px;padding:10px}button{background:#145c48;color:white;border:0;border-radius:7px;padding:10px 16px;cursor:pointer;margin:6px 6px 6px 0}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #efb432}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:right}th:first-child,td:first-child{text-align:left}.bad{background:#ffe8e5}.ok{background:#e6f6eb}.muted{color:#52655e}#output{overflow-x:auto}.error{color:#a21919;white-space:pre-wrap}strong{font-weight:700}@media(max-width:650px){body{padding:9px}main,section{padding:12px}}
+</style>
+<h1>MarginGuard</h1><p class="muted">Free offline price-change checker for small shops. No login, tracking, uploads or automatic price changes.</p>
+<main>
+<p>Paste CSV with headers <code>name,cost,price</code>. Costs and prices must be nonnegative decimal numbers; price must be above zero. Quotes and commas inside product names are supported.</p>
+<label for="csv">Products</label><textarea id="csv" spellcheck="false">name,cost,price
+Coffee beans,8,15
+Reusable mug,6,12
+Notebook,3.25,8</textarea>
+<label for="increase">Supplier cost increase (%) <input id="increase" type="number" value="10" step="0.5" min="-100"></label>
+<label for="discount">Planned selling discount (%) <input id="discount" type="number" value="5" step="0.5" min="0" max="100"></label>
+<label for="floor">Minimum gross margin (%) <input id="floor" type="number" value="35" step="0.5" min="0" max="99.99"></label>
+<button id="check">Analyze prices</button><button id="download">Download results CSV</button>
+<div id="error" class="error" role="alert"></div>
+</main>
+<section><p id="summary" aria-live="polite"></p><div id="output"></div></section>
+<section><h2>What this measures</h2><p>Gross margin = (selling price − unit cost) / selling price. Suggested minimum price = projected unit cost / (1 − desired gross margin). A discount changes selling price; a supplier increase changes unit cost.</p><p class="muted">This is a planning aid, not a full profitability model. It excludes sales tax, shipping, marketplace fees, spoilage, labor, rent, and other overhead. It does not connect to inventory or POS software and never updates live prices. Check those expenses separately before changing actual prices.</p></section>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+function parseCSV(s){let rows=[],row=[],field="",quoted=false,started=false; s=s.replace(/^\uFEFF/,"");
+for(let i=0;i<s.length;i++){let c=s[i];if(quoted){if(c==='"'&&s[i+1]==='"'){field+='"';i++}else if(c==='"')quoted=false;else field+=c}else if(c==='"'&&!started&&field===""){quoted=true;started=true}else if(c===','){row.push(field);field="";started=false}else if(c==='\n'||c==='\r'){if(c==='\r'&&s[i+1]==='\n')i++;row.push(field);if(row.some(x=>x.trim()!==""))rows.push(row);row=[];field="";started=false}else {if(c==='"')throw Error("Unexpected quotation mark in CSV");field+=c;started=true}}
+if(quoted)throw Error("Unclosed CSV quote");row.push(field);if(row.some(x=>x.trim()!==""))rows.push(row);return rows}
+function csvCell(s){s=String(s);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function number(s,label,line){if(!/^\s*(?:\d+(?:\.\d*)?|\.\d+)\s*$/.test(s))throw Error("Row "+line+": invalid "+label);let x=Number(s);if(!Number.isFinite(x))throw Error("Row "+line+": invalid "+label);return x}
+const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let results=[];
+function analyze(){
+$("error").textContent="";$("output").replaceChildren();$("summary").textContent="";results=[];
+try{
+let inc=Number($("increase").value),disc=Number($("discount").value),floor=Number($("floor").value);
+if(![$("increase"),$("discount"),$("floor")].every(e=>e.value.trim()!=="")||![inc,disc,floor].every(Number.isFinite)||inc< -100||disc<0||disc>100||floor<0||floor>=100)throw Error("Check percentage inputs: cost increase ≥ -100%, discount 0–100%, margin target 0–under 100%.");
+const rows=parseCSV($("csv").value);if(rows.length<2)throw Error("Add a header and at least one product.");
+const headers=rows[0].map(x=>x.trim().toLowerCase()), cols=["name","cost","price"].map(h=>headers.indexOf(h));if(cols.some(x=>x<0)||new Set(cols).size!==3)throw Error("CSV needs name,cost,price columns.");
+for(let i=1;i<rows.length;i++){let r=rows[i];if(r.length!==headers.length)throw Error("Row "+(i+1)+": expected "+headers.length+" columns, got "+r.length);
+let name=r[cols[0]].trim(),cost=number(r[cols[1]],"cost",i+1),price=number(r[cols[2]],"price",i+1);
+if(!name||price<=0)throw Error("Row "+(i+1)+": name must be present and price must exceed zero.");
+let newCost=cost*(1+inc/100),newPrice=price*(1-disc/100),margin=newPrice>0?(newPrice-newCost)/newPrice*100:null,minimum=newCost/(1-floor/100),risk=margin===null||margin+1e-9<floor;
+results.push({name,newCost,newPrice,margin,minimum,risk});}
+let bad=results.filter(x=>x.risk).length; $("summary").textContent=results.length+" products analyzed · "+bad+" below target · "+(results.length-bad)+" meet target.";
+let t=document.createElement("table");t.innerHTML="<thead><tr><th>Product</th><th>New cost</th><th>Discounted price</th><th>Gross margin</th><th>Minimum safe price</th><th>Result</th></tr></thead>";
+let body=document.createElement("tbody");
+for(let x of results){let tr=document.createElement("tr");tr.className=x.risk?"bad":"ok";
+let cells=[x.name,x.newCost.toFixed(2),x.newPrice.toFixed(2),x.margin===null?"N/A":x.margin.toFixed(1)+"%",x.minimum.toFixed(2),x.risk?"Below target":"Meets target"];
+for(let c of cells){let td=document.createElement("td");td.textContent=c;tr.append(td)}body.append(tr)}t.append(body);$("output").append(t);
+}catch(e){$("error").textContent=e.message}}
+$("check").addEventListener("click",analyze);
+$("download").addEventListener("click",()=>{analyze();if(!results.length)return;
+let lines=[["name","projected_cost","discounted_price","projected_margin_pct","minimum_price","status"].join(",")];
+for(let x of results)lines.push([x.name,x.newCost.toFixed(2),x.newPrice.toFixed(2),x.margin===null?"":x.margin.toFixed(2),x.minimum.toFixed(2),x.risk?"BELOW_TARGET":"OK"].map(csvCell).join(","));
+let blob=new Blob([lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="marginguard-results.csv";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+analyze();
+</script></html>
