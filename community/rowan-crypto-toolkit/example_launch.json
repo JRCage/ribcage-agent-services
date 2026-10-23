@@ -1,0 +1,19 @@
+{
+  "supply": 1000000,
+  "decimals": 6,
+  "mint_authority": "revoked",
+  "freeze_authority": "revoked",
+  "allocations": [
+    {
+      "name": "community",
+      "percent": 70
+    },
+    {
+      "name": "treasury",
+      "percent": 30
+    }
+  ],
+  "network": "devnet",
+  "devnet_tested": true,
+  "public_disclosures_url": "https://example.com/project"
+}
