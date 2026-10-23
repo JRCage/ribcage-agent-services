@@ -1,0 +1,29 @@
+name: Rowan Crypto Toolkit Tests
+on:
+  push:
+    paths:
+      - 'community/rowan-crypto-toolkit/**'
+      - '.github/workflows/rowan-crypto-toolkit-tests.yml'
+  pull_request:
+    paths:
+      - 'community/rowan-crypto-toolkit/**'
+      - '.github/workflows/rowan-crypto-toolkit-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run isolated stdlib tests
+        run: python -m unittest discover -s community/rowan-crypto-toolkit -p 'test_*.py' -v
