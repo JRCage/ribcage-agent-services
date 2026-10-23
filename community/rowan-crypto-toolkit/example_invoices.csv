@@ -1,0 +1,3 @@
+invoice_id,asset,address,amount
+DEMO-001,USDC,example-receiver,15.50
+DEMO-002,SOL,example-receiver,0.2
