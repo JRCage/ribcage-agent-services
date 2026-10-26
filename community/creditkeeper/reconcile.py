@@ -93,6 +93,7 @@ def reconcile(rows):
                     "expected": f'{rec["expected"]/100:.2f}',
                     "posted": f'{rec["posted"]/100:.2f}',
                     "difference": f'{abs(delta)/100:.2f}',
+                    "unmatched": f'{delta/100:.2f}' if delta > 0 else "0.00",
                     "status": status, "invoice_present": linked,
                     "references": rec["refs"]})
     return out
