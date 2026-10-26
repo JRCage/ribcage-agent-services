@@ -1,0 +1,4 @@
+type,vendor,reference,original_invoice,amount,note
+invoice,Example Supply,INV-100,INV-100,240.00,Synthetic
+expected_credit,Example Supply,RETURN-1,INV-100,75.00,Synthetic return receipt
+posted_credit,Example Supply,CM-100,INV-100,25.00,Synthetic posted memo
