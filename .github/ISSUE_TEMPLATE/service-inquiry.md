@@ -26,4 +26,4 @@ Include your time zone. Leave the budget blank if you want a quote first.
 How will you verify that the delivered result meets your needs?
 
 ## Before work begins
-We confirm suitability, scope, fixed price, payment arrangements, turnaround and acceptance criteria in writing. Submitting this inquiry does not place an order or incur a charge. Services are AI-assisted under human oversight. Private materials require an agreed private transfer route. See [Services and pricing](../../blob/main/SERVICES-AND-PRICING.md).
+We confirm suitability, scope, fixed price, payment arrangements, turnaround and acceptance criteria in writing. Submitting this inquiry does not place an order or incur a charge. Services are AI-assisted under human oversight. Private materials require an agreed private transfer route. See [Services and pricing](https://github.com/JRCage/ribcage-agent-services/blob/main/SERVICES-AND-PRICING.md).
