@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CreditKeeper — supplier credit reconciliation demo</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#172923;background:#f6f8f5}*{box-sizing:border-box}body{margin:0}.wrap{max-width:940px;margin:auto;padding:24px}header{background:#123a30;color:white;padding:18px 0}header .wrap{padding-block:0}h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.1;margin:24px 0 8px}h2{margin-top:0}p{line-height:1.55;color:#3b5249}.dark{color:#d4e2dc}.tag{letter-spacing:.1em;text-transform:uppercase;font-size:.8rem;font-weight:700;color:#9fdec8}.card{background:white;border:1px solid #dae5de;border-radius:14px;padding:24px;margin:20px 0;box-shadow:0 4px 16px #123a3010}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.stat{background:#f2f7f3;border-radius:10px;padding:18px}.stat strong{display:block;font-size:1.8rem}.small{font-size:.88rem;color:#53685e}table{width:100%;border-collapse:collapse}th,td{padding:12px 8px;text-align:left;border-bottom:1px solid #e5ece7}td:last-child,th:last-child{text-align:right}.warning{border-left:4px solid #af6e20;background:#fff7e8;padding:14px;border-radius:6px}.cta{display:inline-block;background:#155f4a;color:white;padding:13px 18px;border-radius:8px;text-decoration:none;font-weight:700}button{background:#155f4a;color:white;border:0;border-radius:8px;padding:11px 16px;font-size:1rem;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #d88d30;outline-offset:2px}footer{margin-top:30px;padding:20px 0;border-top:1px solid #d6e2db}label{display:block;margin:8px 0;font-weight:600}input{font-size:1rem;padding:10px;width:100%;border-radius:6px;border:1px solid #8aa69a}code{font-size:.91em}#result{font-weight:700;font-size:1.3rem} .muted{color:#53685e}
+</style></head>
+<body>
+<header><div class="wrap"><strong>CreditKeeper</strong> <span style="float:right">Demonstration · Not a live service</span></div></header>
+<main class="wrap">
+<p class="tag">For landscaping installation and materials-heavy service firms</p>
+<h1>Track the supplier credits that never reach your statement.</h1>
+<p>Return receipts, credit promises and supplier statements often live in different places. CreditKeeper reconciles the evidence and highlights what needs follow-up—without replacing your accounting system.</p>
+<section class="card" aria-labelledby="example"><h2 id="example">A real calculation using fictional records</h2>
+<p>Example Supply issues invoice INV-100. A documented return is expected to generate a $75 credit. The account statement shows only $25 posted.</p>
+<table><thead><tr><th scope="col">Document</th><th scope="col">Amount</th></tr></thead><tbody>
+<tr><td>Invoice INV-100</td><td>$240.00</td></tr>
+<tr><td>Expected return credit RETURN-1</td><td>$75.00</td></tr>
+<tr><td>Posted credit CM-100</td><td>$25.00</td></tr>
+</tbody></table>
+<div class="grid" style="margin-top:16px">
+<div class="stat"><span class="small">Expected credit</span><strong>$75</strong></div>
+<div class="stat"><span class="small">Posted credit</span><strong>$25</strong></div>
+<div class="stat"><span class="small">Unmatched expected credit</span><strong>$50</strong></div>
+</div>
+<p class="warning"><strong>Status: suspected missing credit.</strong> This is not a verified overcharge or recovered refund. Verify return acceptance and any credit conditions before contacting the supplier.</p>
+<h3>Try a safe calculation</h3>
+<div class="grid"><div><label for="expected">Documented expected credit ($)</label><input id="expected" type="number" step=".01" min="0" max="1000000" value="75"></div><div><label for="posted">Credit posted to statement ($)</label><input id="posted" type="number" step=".01" min="0" max="1000000" value="25"></div></div>
+<p><button id="calculate" type="button">Check difference</button></p><p id="result" role="status" aria-live="polite">Unmatched expected credit: $50.00</p>
+<p class="small">Only figures typed into this page are used. No documents, credentials or customer information are collected or transmitted by this demonstration.</p>
+</section>
+<section class="grid" aria-label="How it works">
+<div class="card"><h2>1. Establish evidence</h2><p>Compare each vendor invoice with a return receipt, written credit promise or approved claim.</p></div>
+<div class="card"><h2>2. Flag exceptions</h2><p>Use exact-decimal reconciliation, show source references and separate missing evidence from missing money.</p></div>
+<div class="card"><h2>3. Approve follow-up</h2><p>A person reviews the proposed supplier message and proof before contact. Later, confirm posted recovery separately.</p></div>
+</section>
+<section class="card"><h2>Proposed limited pilot</h2><p><strong>$49 introductory audit</strong> of up to 25 authorized supplier documents, subject to availability and a secure intake process. Follow-up subscription price under evaluation. No guaranteed savings.</p>
+<p><strong>Current status:</strong> this is a prototype under independent review, not a checkout page. We are not accepting confidential business documents or payment through this demo.</p>
+<p>For pilot interest, please write <a href="mailto:johnnyribcage@proton.me?subject=CreditKeeper%20pilot%20interest">the pilot coordination desk</a>. Please do not attach invoices or sensitive records in your first message.</p></section>
+<footer class="small">AI-assisted, human-reviewed. Example data are synthetic. No automatic vendor disputes or financial transactions. © 2026 CreditKeeper pilot.</footer>
+</main>
+<script>
+"use strict";
+const money=n=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(n);
+document.getElementById("calculate").addEventListener("click",()=>{
+const a=document.getElementById("expected").value,b=document.getElementById("posted").value,out=document.getElementById("result");
+const valid=s=>/^(?:\d{1,7})(?:\.\d{1,2})?$/.test(s);
+if(!valid(a)||!valid(b)){out.textContent="Enter nonnegative dollar amounts with up to two decimal places.";return}
+const cents=s=>{const [w,f=""]=s.split(".");return Number(w)*100+Number((f+"00").slice(0,2))};
+const remaining=cents(a)-cents(b);
+out.textContent=remaining>0?"Unmatched expected credit: "+money(remaining/100):"No unmatched expected credit in these figures.";
+});
+</script></body></html>
