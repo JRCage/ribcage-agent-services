@@ -1,9 +1,9 @@
 """Strict, read-only reconciliation of synthetic invoice and credit rows."""
 import csv
 import json
+import re
 import sys
 from collections import defaultdict
-from decimal import Decimal, InvalidOperation
 
 REQUIRED = ("type", "vendor", "reference", "original_invoice", "amount")
 ALLOWED = set(REQUIRED) | {"note"}
@@ -42,19 +42,19 @@ def read_csv(path):
 
 def to_cents(raw, row_number):
     value = str(raw).strip()
-    if not value or value.startswith(("+", "-")):
-        raise ValueError(f"row {row_number}: invalid amount")
-    if "," in value:
-        chunks = value.split(".")[0].split(",")
-        if not (chunks[0].isdigit() and 1 <= len(chunks[0]) <= 3 and all(len(x) == 3 and x.isdigit() for x in chunks[1:])):
-            raise ValueError(f"row {row_number}: malformed thousands separator")
-    try:
-        amount = Decimal(value.replace(",", ""))
-    except (InvalidOperation, TypeError):
-        raise ValueError(f"row {row_number}: invalid amount") from None
-    if not amount.is_finite() or amount <= 0 or amount.as_tuple().exponent < -2:
-        raise ValueError(f"row {row_number}: amount must be positive, finite, and limited to cents")
-    return int(amount * 100)
+    # Bound input before Decimal conversion; reject exponent/underscore syntax
+    # and separators outside conventional thousands groups.
+    if not re.fullmatch(r"(?:[0-9]{1,12}|[0-9]{1,3}(?:,[0-9]{3}){1,3})(?:\.[0-9]{1,2})?", value):
+        raise ValueError(f"row {row_number}: invalid amount; use positive dollars and cents")
+    whole, _, fraction = value.replace(",", "").partition(".")
+    cents = int(whole) * 100 + int((fraction + "00")[:2])
+    if cents <= 0:
+        raise ValueError(f"row {row_number}: amount must be positive")
+    return cents
+
+def money(cents):
+    return f"{cents // 100}.{cents % 100:02d}"
+
 
 def reconcile(rows):
     entries = defaultdict(lambda: {"expected": 0, "posted": 0, "refs": []})
@@ -85,15 +85,15 @@ def reconcile(rows):
     out = []
     for (vendor, original), rec in sorted(entries.items()):
         delta = rec["expected"] - rec["posted"]
-        if not delta:
-            continue
         linked = (vendor, original) in invoices
+        if not delta and linked:
+            continue
         status = ("suspected_missing_credit" if delta > 0 else "suspected_excess_credit") if linked else "needs_evidence"
         out.append({"vendor": vendor, "invoice": original,
-                    "expected": f'{rec["expected"]/100:.2f}',
-                    "posted": f'{rec["posted"]/100:.2f}',
-                    "difference": f'{abs(delta)/100:.2f}',
-                    "unmatched": f'{delta/100:.2f}' if delta > 0 else "0.00",
+                    "expected": money(rec["expected"]),
+                    "posted": money(rec["posted"]),
+                    "difference": money(abs(delta)),
+                    "unmatched": money(delta) if delta > 0 else "0.00",
                     "status": status, "invoice_present": linked,
                     "references": rec["refs"]})
     return out
@@ -112,3 +112,4 @@ def main(args):
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
+
