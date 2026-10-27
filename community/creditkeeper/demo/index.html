@@ -45,7 +45,9 @@ const a=document.getElementById("expected").value,b=document.getElementById("pos
 const valid=s=>/^(?:\d{1,7})(?:\.\d{1,2})?$/.test(s);
 if(!valid(a)||!valid(b)){out.textContent="Enter nonnegative dollar amounts with up to two decimal places.";return}
 const cents=s=>{const [w,f=""]=s.split(".");return Number(w)*100+Number((f+"00").slice(0,2))};
-const remaining=cents(a)-cents(b);
-out.textContent=remaining>0?"Unmatched expected credit: "+money(remaining/100):"No unmatched expected credit in these figures.";
+const expected=cents(a),posted=cents(b);
+if(expected>100000000||posted>100000000){out.textContent="Enter amounts no greater than $1,000,000.00.";return}
+const remaining=expected-posted;
+out.textContent=remaining>0?"Unmatched expected credit: "+money(remaining/100):remaining<0?"Suspected excess credit: "+money(-remaining/100):"Expected and posted credits balance in these figures.";
 });
 </script></body></html>

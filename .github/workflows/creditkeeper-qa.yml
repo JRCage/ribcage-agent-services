@@ -1,0 +1,47 @@
+name: CreditKeeper synthetic QA
+on:
+  push:
+    branches: [rowan/expense-recovery-pilot-2026-10]
+    paths: ['community/creditkeeper/**', '.github/workflows/creditkeeper-qa.yml']
+  pull_request:
+    paths: ['community/creditkeeper/**', '.github/workflows/creditkeeper-qa.yml']
+permissions:
+  contents: read
+jobs:
+  synthetic-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Run offline with read-only source and bounded scratch
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Import an empty root filesystem: no registry pull or dependency install.
+          tar -cf - --files-from /dev/null | docker import - creditkeeper-empty:qa >/dev/null
+          NODE_BIN="$(readlink -f "$(command -v node)")"
+          test -x /usr/bin/python3
+          timeout --signal=KILL 60s docker run --rm --name creditkeeper-qa \
+            --network none --read-only --cap-drop ALL \
+            --security-opt no-new-privileges --user 65534:65534 \
+            --pids-limit 32 --memory 512m --memory-swap 512m --cpus 1 \
+            --ulimit cpu=15:15 --ulimit fsize=1048576:1048576 --ulimit nofile=64:64 \
+            --tmpfs /scratch:rw,noexec,nosuid,nodev,size=16m,nr_inodes=256,mode=1777 \
+            --mount type=bind,src=/usr,dst=/usr,readonly \
+            --mount type=bind,src=/usr/bin,dst=/bin,readonly \
+            --mount type=bind,src=/usr/lib,dst=/lib,readonly \
+            --mount type=bind,src=/usr/lib64,dst=/lib64,readonly \
+            --mount "type=bind,src=$NODE_BIN,dst=/node,readonly" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/community/creditkeeper,dst=/work,readonly" \
+            creditkeeper-empty:qa /usr/bin/env -i \
+              HOME=/scratch TMPDIR=/scratch XDG_CACHE_HOME=/scratch \
+              PYTHONDONTWRITEBYTECODE=1 PATH=/scratch:/usr/bin:/bin \
+              /bin/sh -ec 'ln -s /usr/bin/python3 /scratch/python
+                cd /work
+                python -m unittest discover -v && python reconcile.py sample.csv
+                /node test_demo.cjs'
+      - name: Remove container if timeout interrupted the client
+        if: always()
+        run: docker rm -f creditkeeper-qa >/dev/null 2>&1 || true
