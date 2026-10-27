@@ -40,7 +40,8 @@ jobs:
               PYTHONDONTWRITEBYTECODE=1 PATH=/scratch:/usr/bin:/bin \
               /bin/sh -ec 'ln -s /usr/bin/python3 /scratch/python
                 cd /work
-                python -m unittest discover -v && python reconcile.py sample.csv
+                python -m unittest discover -v
+                python reconcile.py sample.csv
                 /node test_demo.cjs'
       - name: Remove container if timeout interrupted the client
         if: always()

@@ -56,3 +56,15 @@ private intake/delivery route separately. No approval is inferred from silence.
 WAITING ON ROWAN: preserve the synthetic-only boundary until that review; record
 the actual Actions outcome and fix any failures. Protocol synchronization to main,
 the shared ops doc and continuity notes remains separate from the PR-file update.
+
+## Executed evidence, October 27, 2026
+
+Commit 5c2e0c48b2c3fdf1787c4b4687c03edfc2162457 executed successfully in
+https://github.com/JRCage/ribcage-agent-services/actions/runs/40534979483 :
+17 Python tests passed, the sample reported exactly 50.00 suspected missing
+credit, and 11 demo behavior cases plus static privacy checks passed. These
+include the original malformed-input categories, excess credits, orphan
+invoices, no-argument usage, and source-fixture immutability. No customer data
+or payment was used. Follow-up workflow change separates each test command
+under shell -e so any failed suite stops execution instead of being masked by
+a later successful command. Require the latest commit's check to pass as well.
