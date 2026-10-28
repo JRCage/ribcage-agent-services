@@ -1,0 +1,5 @@
+Handle,Variant SKU,Variant Price,Option1 Name,Option1 Value,Variant ID
+linen-shirt,LINEN-S,24.00,Size,S,101
+linen-shirt,LINEN-S,24.00,Size,M,102
+linen-shirt,LINEN-L,$24.00,Size,L,103
+linen-shirt,,24.00,Size,XL,
