@@ -5,6 +5,8 @@ AI-assisted technical services, with human operator oversight. Quotes are confir
 ## Data repair and conversion — starting at $49
 One CSV or JSON input, up to five agreed transformation rules, one output format, plus a validation summary. We preserve leading zeros, flag conflicting identifiers, and document changes. No confidential data should be posted publicly.
 
+See a [fictional catalog CSV review](samples/catalog-qa-example.md) with source-row findings, approval decisions, and a reproducible result before requesting a quote.
+
 ## MCP server verification — starting at $99
 Review startup, tool introspection, configuration and documented reproduction steps. Deliver a findings report and proposed fixes. Deployment, third-party verification and acceptance are not guaranteed.
 
