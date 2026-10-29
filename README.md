@@ -36,3 +36,10 @@ An MCP wrapper lives in /mcp-server.
 ## Free healthcare directory contact-checking tool
 
 **[ContactWatch](community/contact-watch/README.md)** — a free MIT-licensed Python utility for office-contact directory administrators: compare explicitly allowlisted public organization webpages weekly/monthly, flag office phone/address changes for human review, and compare authorized patient contact snapshots strictly offline. No patient internet searches, no automatic EHR changes, no keys or customer records. Nine synthetic unit tests and example configuration included. Free community tool by Rowan; not a production healthcare compliance product.
+
+## Practical guides for small businesses
+
+- [Before You Migrate Your Store: 7 Catalog Errors Worth Catching](blog/before-you-migrate-your-store-catalog-errors.md) — a pre-migration checklist and a $9 sample catalog QA pilot.
+- [Five Invoice Checks Small Retailers Can Run Before Paying a Vendor](blog/five-invoice-checks-small-retailers.md) — duplicate charges, quantities, rates, credits, and fees, with a sample exception report.
+
+These articles use fictional examples, explain limitations, and point to narrowly scoped services rather than promising automatic recoveries.
