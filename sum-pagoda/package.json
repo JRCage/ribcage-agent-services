@@ -1,0 +1,7 @@
+{
+  "name": "sum-pagoda",
+  "productName": "Sum Pagoda",
+  "version": "1.0.0",
+  "main": "main.js",
+  "private": true
+}
