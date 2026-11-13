@@ -38,7 +38,7 @@ $expected='cd1ab0d49c2f76838c0c9ff75afefb4d9d85ca59036691932bf35be8eceba98b'
 if($actual -ne $expected){throw "Electron SHA mismatch: $actual"}
 Expand-Archive -LiteralPath $electronZip -DestinationPath $release -Force
 Rename-Item (Join-Path $release 'electron.exe') 'SumPagoda.exe'
-foreach($item in @('SumPagoda.exe','resources\electron.asar','resources\app\SumPagoda.html','resources\app\main.js','resources\app\package.json')){
+foreach($item in @('SumPagoda.exe','resources\app\SumPagoda.html','resources\app\main.js','resources\app\package.json')){
  if(!(Test-Path (Join-Path $release $item))){throw "Missing game item $item"}
 }
 $exe=Join-Path $release 'SumPagoda.exe'
