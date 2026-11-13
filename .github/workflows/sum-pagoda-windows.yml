@@ -1,0 +1,21 @@
+name: Sum Pagoda Windows executable
+on:
+  push:
+    branches:
+      - build/sum-pagoda-windows-20261113
+jobs:
+  package-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and smoke-test Windows executable
+        shell: pwsh
+        run: ./sum-pagoda/build.ps1
+      - name: Upload complete Steam game folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: SumPagoda-Steam-Windows
+          path: sum-pagoda/dist/SumPagoda-Steam-Windows.zip
+          if-no-files-found: error
